@@ -1,0 +1,29 @@
+HUMAN-AGENT GAP ANALYSIS REPORT
+============================================================
+
+Tier 1 -- empirical choice entropy / concentration (ALL categories pooled):
+  ChatGPT GPT 5.5      entropy_norm=0.9867  hhi=0.2595  (n=384)
+  ChatGPT O3           entropy_norm=0.9990  hhi=0.2507  (n=384)
+  Claude Opus 4.6      entropy_norm=0.9956  hhi=0.2530  (n=384)
+  Claude Opus 4.8      entropy_norm=0.9937  hhi=0.2545  (n=384)
+  Claude Sonnet 4.6    entropy_norm=0.9989  hhi=0.2508  (n=384)
+  Grok 4.2             entropy_norm=0.9680  hhi=0.2728  (n=334)
+  Human (pooled)       entropy_norm=0.9986  hhi=0.2509  (n=6016)
+
+Tier 2 -- inter-agent agreement (n_items=334, n_raters=6):
+  Fleiss' kappa = 0.3505 (fair, Landis & Koch scale)
+
+Tier 3 -- model-based flagship gap metric D_HA = JSD(P_human_twin, P_agent_twin):
+  on agent_test: mean JSD = 0.0192  median = 0.0146  (n=480)
+  on human_test: mean JSD = 0.0503  median = 0.0367  (n=1203)
+
+INTERPRETATION
+------------------------------------------------------------
+Higher entropy_norm / lower hhi means a group's choices are less
+predictable (closer to uniform over A/B/C/D). Fleiss' kappa quantifies
+how much the 6 LLM agents agree with each other on identical tasks,
+beyond chance. D_HA (mean JSD) is the flagship number: how much the
+agent-trained twin's implied choice distribution diverges from the
+human-trained twin's, on the same held-out decision tasks -- a value
+of 0 would mean the twins are indistinguishable; this study's premise
+is that it is meaningfully greater than 0.

@@ -1,0 +1,5 @@
+architecture,cell,accuracy,macro_f1,n,train_seconds
+mnl_baseline,agent->agent,0.3875,0.3844,480,0.6
+mnl_baseline,agent->human,0.3965,0.3941,1203,0.6
+mnl_baseline,human->agent,0.3250,0.3251,480,0.6
+mnl_baseline,human->human,0.3973,0.3952,1203,0.6

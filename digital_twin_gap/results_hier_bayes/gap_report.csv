@@ -1,0 +1,2 @@
+architecture,acc_agent_matched,acc_human_matched,acc_agent_on_human,acc_human_on_agent,gap_on_human,gap_on_agent
+hier_bayes,0.3812,0.4256,0.3807,0.3021,+0.0449,+0.0792

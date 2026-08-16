@@ -1,0 +1,2 @@
+architecture,acc_agent_matched,acc_human_matched,acc_agent_on_human,acc_human_on_agent,gap_on_human,gap_on_agent
+mnl_baseline,0.3875,0.3973,0.3965,0.3250,+0.0008,+0.0625

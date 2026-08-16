@@ -1,0 +1,5 @@
+architecture,cell,accuracy,macro_f1,n,train_seconds
+hier_bayes,agent->agent,0.3812,0.3798,480,587.6
+hier_bayes,agent->human,0.3807,0.3790,1203,587.6
+hier_bayes,human->agent,0.3021,0.3027,480,2067.6
+hier_bayes,human->human,0.4256,0.4255,1203,2067.6
