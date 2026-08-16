@@ -1,0 +1,4 @@
+architecture,acc_agent_matched,acc_human_matched,acc_agent_on_human,acc_human_on_agent,gap_on_human,gap_on_agent
+tfidf_logreg,0.6646,0.4331,0.3832,0.4271,+0.0499,+0.2375
+embed_mlp,0.5521,0.4256,0.3591,0.4271,+0.0665,+0.1250
+distilbert,0.4646,0.4431,0.2984,0.2875,+0.1446,+0.1771

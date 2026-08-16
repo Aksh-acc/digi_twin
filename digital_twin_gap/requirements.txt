@@ -1,0 +1,28 @@
+# Core
+pandas>=2.0.0
+numpy>=1.24.0
+pyyaml>=6.0
+scikit-learn>=1.2.0
+openpyxl>=3.1.0        # reading the agent .xlsx files
+tqdm>=4.65.0
+
+# Neural models (embed_mlp + distilbert)
+torch>=2.0.0
+transformers>=4.30.0
+sentence-transformers>=2.2.0
+
+# Plotting the results
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Hierarchical-twin track (Model 1: mnl_baseline, Model 2: hier_bayes,
+# gap_analysis). scipy powers Model 1's hand-rolled discrete-choice optimizer;
+# numpyro/arviz power Model 2's Bayesian inference (NUTS) + MCMC diagnostics.
+# NumPyro was picked over PyMC because it needs no C/C++ compiler toolchain to
+# JIT-compile the model (a common friction point on native Windows) and runs
+# fine on CPU -- this model's runtime is leapfrog-step-bound, not FLOP-bound,
+# so GPU acceleration isn't worth pursuing here. See
+# docs/hierarchical_twin_spec.md for the full model spec.
+scipy>=1.10.0
+numpyro>=0.15.0
+arviz>=0.17.0

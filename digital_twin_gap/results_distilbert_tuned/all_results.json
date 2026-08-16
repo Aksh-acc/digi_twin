@@ -1,0 +1,258 @@
+{
+  "tfidf_logreg": {
+    "cells": {
+      "agent->agent": {
+        "accuracy": 0.6645833333333333,
+        "macro_f1": 0.6619249174019685,
+        "n": 480,
+        "per_agent": {
+          "ChatGPT GPT 5.5": {
+            "accuracy": 0.7083333333333334,
+            "n": 96
+          },
+          "Claude Opus 4.6": {
+            "accuracy": 0.6822916666666666,
+            "n": 192
+          },
+          "Claude Sonnet 4.6": {
+            "accuracy": 0.625,
+            "n": 192
+          }
+        },
+        "train_seconds": 5.1
+      },
+      "agent->human": {
+        "accuracy": 0.38320864505403157,
+        "macro_f1": 0.38260430781095667,
+        "n": 1203,
+        "train_seconds": 5.1
+      },
+      "human->agent": {
+        "accuracy": 0.4270833333333333,
+        "macro_f1": 0.4288785107066124,
+        "n": 480,
+        "per_agent": {
+          "ChatGPT GPT 5.5": {
+            "accuracy": 0.5625,
+            "n": 96
+          },
+          "Claude Opus 4.6": {
+            "accuracy": 0.3802083333333333,
+            "n": 192
+          },
+          "Claude Sonnet 4.6": {
+            "accuracy": 0.40625,
+            "n": 192
+          }
+        },
+        "train_seconds": 8.3
+      },
+      "human->human": {
+        "accuracy": 0.43308395677472983,
+        "macro_f1": 0.4327879898184437,
+        "n": 1203,
+        "train_seconds": 8.3
+      }
+    },
+    "gaps": {
+      "acc_agent_matched": 0.6645833333333333,
+      "acc_human_matched": 0.43308395677472983,
+      "acc_agent_on_human": 0.38320864505403157,
+      "acc_human_on_agent": 0.4270833333333333,
+      "gap_on_human": 0.04987531172069826,
+      "gap_on_agent": 0.2375
+    }
+  },
+  "embed_mlp": {
+    "cells": {
+      "agent->agent": {
+        "accuracy": 0.5520833333333334,
+        "macro_f1": 0.5507115694416083,
+        "n": 480,
+        "per_agent": {
+          "ChatGPT GPT 5.5": {
+            "accuracy": 0.6041666666666666,
+            "n": 96
+          },
+          "Claude Opus 4.6": {
+            "accuracy": 0.5989583333333334,
+            "n": 192
+          },
+          "Claude Sonnet 4.6": {
+            "accuracy": 0.4791666666666667,
+            "n": 192
+          }
+        },
+        "train_seconds": 66.9
+      },
+      "agent->human": {
+        "accuracy": 0.35910224438902744,
+        "macro_f1": 0.34974047678015907,
+        "n": 1203,
+        "train_seconds": 66.9
+      },
+      "human->agent": {
+        "accuracy": 0.4270833333333333,
+        "macro_f1": 0.4040765217772517,
+        "n": 480,
+        "per_agent": {
+          "ChatGPT GPT 5.5": {
+            "accuracy": 0.5520833333333334,
+            "n": 96
+          },
+          "Claude Opus 4.6": {
+            "accuracy": 0.3958333333333333,
+            "n": 192
+          },
+          "Claude Sonnet 4.6": {
+            "accuracy": 0.3958333333333333,
+            "n": 192
+          }
+        },
+        "train_seconds": 26.7
+      },
+      "human->human": {
+        "accuracy": 0.4256026600166251,
+        "macro_f1": 0.4042056886947478,
+        "n": 1203,
+        "train_seconds": 26.7
+      }
+    },
+    "gaps": {
+      "acc_agent_matched": 0.5520833333333334,
+      "acc_human_matched": 0.4256026600166251,
+      "acc_agent_on_human": 0.35910224438902744,
+      "acc_human_on_agent": 0.4270833333333333,
+      "gap_on_human": 0.06650041562759768,
+      "gap_on_agent": 0.12500000000000006
+    }
+  },
+  "distilbert": {
+    "cells": {
+      "agent->agent": {
+        "accuracy": 0.46458333333333335,
+        "macro_f1": 0.35793501214232926,
+        "n": 480,
+        "per_agent": {
+          "ChatGPT GPT 5.5": {
+            "accuracy": 0.40625,
+            "n": 96
+          },
+          "Claude Opus 4.6": {
+            "accuracy": 0.4791666666666667,
+            "n": 192
+          },
+          "Claude Sonnet 4.6": {
+            "accuracy": 0.4791666666666667,
+            "n": 192
+          }
+        },
+        "train_seconds": 107.3
+      },
+      "agent->human": {
+        "accuracy": 0.29842061512884455,
+        "macro_f1": 0.2590984410401711,
+        "n": 1203,
+        "train_seconds": 107.3
+      },
+      "human->agent": {
+        "accuracy": 0.2875,
+        "macro_f1": 0.26457516789225316,
+        "n": 480,
+        "per_agent": {
+          "ChatGPT GPT 5.5": {
+            "accuracy": 0.2916666666666667,
+            "n": 96
+          },
+          "Claude Opus 4.6": {
+            "accuracy": 0.2864583333333333,
+            "n": 192
+          },
+          "Claude Sonnet 4.6": {
+            "accuracy": 0.2864583333333333,
+            "n": 192
+          }
+        },
+        "train_seconds": 179.1
+      },
+      "human->human": {
+        "accuracy": 0.44305901911886947,
+        "macro_f1": 0.4361467876296986,
+        "n": 1203,
+        "train_seconds": 179.1
+      }
+    },
+    "gaps": {
+      "acc_agent_matched": 0.46458333333333335,
+      "acc_human_matched": 0.44305901911886947,
+      "acc_agent_on_human": 0.29842061512884455,
+      "acc_human_on_agent": 0.2875,
+      "gap_on_human": 0.14463840399002492,
+      "gap_on_agent": 0.17708333333333337
+    }
+  },
+  "distilbert_tuned": {
+    "cells": {
+      "agent->agent": {
+        "accuracy": 0.6041666666666666,
+        "macro_f1": 0.5871213320815604,
+        "n": 480,
+        "per_agent": {
+          "ChatGPT GPT 5.5": {
+            "accuracy": 0.5625,
+            "n": 96
+          },
+          "Claude Opus 4.6": {
+            "accuracy": 0.6510416666666666,
+            "n": 192
+          },
+          "Claude Sonnet 4.6": {
+            "accuracy": 0.578125,
+            "n": 192
+          }
+        },
+        "train_seconds": 201.3
+      },
+      "agent->human": {
+        "accuracy": 0.3316708229426434,
+        "macro_f1": 0.33092548615276884,
+        "n": 1203,
+        "train_seconds": 201.3
+      },
+      "human->agent": {
+        "accuracy": 0.3625,
+        "macro_f1": 0.3126555172537442,
+        "n": 480,
+        "per_agent": {
+          "ChatGPT GPT 5.5": {
+            "accuracy": 0.4270833333333333,
+            "n": 96
+          },
+          "Claude Opus 4.6": {
+            "accuracy": 0.3697916666666667,
+            "n": 192
+          },
+          "Claude Sonnet 4.6": {
+            "accuracy": 0.3229166666666667,
+            "n": 192
+          }
+        },
+        "train_seconds": 466.0
+      },
+      "human->human": {
+        "accuracy": 0.4372402327514547,
+        "macro_f1": 0.4352058930924224,
+        "n": 1203,
+        "train_seconds": 466.0
+      }
+    },
+    "gaps": {
+      "acc_agent_matched": 0.6041666666666666,
+      "acc_human_matched": 0.4372402327514547,
+      "acc_agent_on_human": 0.3316708229426434,
+      "acc_human_on_agent": 0.3625,
+      "gap_on_human": 0.1055694098088113,
+      "gap_on_agent": 0.24166666666666664
+    }
+  }
+}

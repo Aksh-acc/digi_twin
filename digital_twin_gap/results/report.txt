@@ -1,0 +1,37 @@
+DIGITAL-TWIN GAP REPORT
+============================================================
+
+Accuracy of predicting the chosen product option (A/B/C/D).
+Random baseline for a 4-way choice = 0.25.
+
+[tfidf_logreg]
+  Agent twin on agents (matched)   : 0.6646
+  Human twin on humans (matched)   : 0.4331
+  Agent twin on humans (transfer)  : 0.3832
+  Human twin on agents (transfer)  : 0.4271
+  GAP on humans (matched-transfer) : +0.0499
+  GAP on agents (matched-transfer) : +0.2375
+
+[embed_mlp]
+  Agent twin on agents (matched)   : 0.5521
+  Human twin on humans (matched)   : 0.4256
+  Agent twin on humans (transfer)  : 0.3591
+  Human twin on agents (transfer)  : 0.4271
+  GAP on humans (matched-transfer) : +0.0665
+  GAP on agents (matched-transfer) : +0.1250
+
+[distilbert]
+  Agent twin on agents (matched)   : 0.4646
+  Human twin on humans (matched)   : 0.4431
+  Agent twin on humans (transfer)  : 0.2984
+  Human twin on agents (transfer)  : 0.2875
+  GAP on humans (matched-transfer) : +0.1446
+  GAP on agents (matched-transfer) : +0.1771
+
+INTERPRETATION
+------------------------------------------------------------
+A large positive gap means a twin built from one population is a poor
+stand-in for the other. If agent-matched accuracy is much higher than
+human-matched accuracy, it means LLM agents make far more predictable
+(consistent, rule-like) choices than real people do -- so an 'agentic
+digital twin' overstates how well it would model human consumers.

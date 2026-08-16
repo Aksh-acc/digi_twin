@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+results/_distilbert_tmp/
+*.zip
+.ipynb_checkpoints/
+data/unified/
+
+# hier_bayes posterior pickles: large (5-20MB each, several near-duplicate
+# copies across results_*/ dirs) and fully regeneratable from
+# `python -m src.run_all --models hier_bayes` (see docs/hierarchical_twin_spec.md
+# §10) -- not worth carrying in git history. Everything derived from them
+# (CSVs, JSON summaries, figures) IS committed.
+results_*/hier_bayes_model_*.pkl
+# Throwaway pre-flight sanity-check dirs (see configs/config_hier_bayes_smoke.yaml).
+results_*_smoke/

@@ -1,0 +1,67 @@
+# =============================================================================
+# Digital-Twin Gap Study — configuration
+# =============================================================================
+# All paths are RELATIVE to the project root (the folder that contains src/,
+# configs/, data/ ...). The setup cell in the Colab/Kaggle notebook, and
+# run_all.py, both cd into the project root before running anything, so these
+# relative paths resolve correctly everywhere (Colab, Kaggle, local, server).
+#
+# If your extracted data lives somewhere else, edit ONLY the two paths under
+# data.agentic_root and data.human_files.
+# =============================================================================
+
+data:
+  # Root of the "Agentic response" folder (contains Claude/, Chatgpt/, Grok 4.2/).
+  agentic_root: "data/raw/Agentic response"
+
+  # Pre-built human chat-format files from the original project.
+  # (train + val are concatenated, then re-split by our own grouped splitter.)
+  human_files:
+    - "data/raw/human/llm_train_human.jsonl"
+    - "data/raw/human/llm_val_human.jsonl"
+
+  # Where unified per-source jsonl gets written.
+  unified_dir: "data/unified"
+
+  # Reproducible split ratios (applied within each source, grouped so no
+  # agent-run / participant leaks across train and test).
+  test_size: 0.2
+  seed: 42
+
+# -----------------------------------------------------------------------------
+# Models. Each is a separate ARCHITECTURE evaluated on the full 4-cell transfer
+# matrix (train agent/human x test agent/human).
+# -----------------------------------------------------------------------------
+models:
+  # (1) Classic ML baseline — always runs, CPU only, seconds to train.
+  tfidf_logreg:
+    enabled: true
+    max_features: 20000
+    ngram_max: 2
+    C: 4.0
+
+  # (2) Frozen sentence-embedding + small MLP head.
+  #     Embeddings computed once with a frozen encoder; only the head trains.
+  embed_mlp:
+    enabled: true
+    encoder: "sentence-transformers/all-MiniLM-L6-v2"
+    hidden_dim: 256
+    dropout: 0.3
+    epochs: 40
+    batch_size: 64
+    lr: 0.001
+
+  # (3) Fine-tuned transformer encoder (DistilBERT) as a 4-way classifier.
+  #     This is the heaviest model; needs a GPU to be quick but will fall back
+  #     to CPU (slow) if none is present.
+  distilbert:
+    enabled: true
+    model_name: "distilbert-base-uncased"
+    max_length: 512
+    epochs: 3
+    batch_size: 8
+    lr: 0.00002
+    grad_accum: 2
+
+output:
+  results_dir: "results"
