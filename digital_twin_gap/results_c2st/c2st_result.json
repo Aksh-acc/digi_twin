@@ -1,0 +1,23 @@
+{
+  "auc": 0.5778789459197127,
+  "auc_train_in_sample": 0.6029039665994937,
+  "balanced_accuracy": 0.5591534834195315,
+  "permutation_p_value": 0.000999000999000999,
+  "n_train": 6603,
+  "n_test": 1667,
+  "n_test_agent": 456,
+  "n_test_human": 1211,
+  "feature_importances": {
+    "price_z": -0.7667963277190678,
+    "price_rank_c": 0.5959029940943443,
+    "rating_z": -0.1692125414280311,
+    "rating_rank_c": -0.08553598990259938,
+    "review_log_z": 0.026373175508639053,
+    "review_rank_c": 0.012254335008569059,
+    "category_AIR": -0.01944676853799548,
+    "category_COF": 0.0408492907135749,
+    "category_EAR": -0.012474131809014266,
+    "category_SNK": 0.05877023390018958
+  },
+  "interpretation": "AUC ~0.5 => populations behaviorally indistinguishable on these features. AUC ~1.0 => near-perfect separation -- if this occurs, suspect residual template/configuration leakage rather than a genuine behavioral signal."
+}

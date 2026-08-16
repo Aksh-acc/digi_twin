@@ -1,0 +1,84 @@
+# =============================================================================
+# Digital-Twin Gap Study — CORRECTED SPLIT: two-way blocked (strictest fix)
+# =============================================================================
+# See configs/config_corrected_prompt.yaml's header and the LEAKAGE NOTE in
+# src/splits.py for the full leakage audit this responds to.
+#
+# `split_mode: "twoway"`: agents are prompt-blocked (same as the "prompt"
+# config -- the 6 LLMs studied here ARE the whole population of interest, so
+# there is no unseen 7th model to generalize to). Humans are blocked JOINTLY
+# on prompt AND participant: test = rows where BOTH the product and the person
+# are unseen; the two off-diagonal blocks (new person/seen product, seen
+# person/new product) are discarded. This is the strictest, most defensible
+# human split -- "a new person deciding about a new product" -- at the cost of
+# a much smaller human test set (~240 rows vs. 1211 under pure prompt-blocking)
+# and correspondingly wider confidence intervals. Report this ALONGSIDE
+# config_corrected_prompt.yaml's numbers, not instead of them: agreement
+# between the two is itself evidence the finding isn't an artifact of either
+# split's specific data loss.
+#
+# All 8 architectures run here, same as config_corrected_prompt.yaml.
+#
+# Writes to results_corrected_twoway/ — no existing results/* directory is
+# ever touched by this file.
+# =============================================================================
+
+data:
+  agentic_root: "data/raw/Agentic response"
+  human_files:
+    - "data/raw/human/llm_train_human.jsonl"
+    - "data/raw/human/llm_val_human.jsonl"
+  unified_dir: "data/unified"
+  test_size: 0.2
+  seed: 42
+  split_mode: "twoway"
+
+models:
+  tfidf_logreg:
+    enabled: true
+    max_features: 20000
+    ngram_max: 2
+    C: 4.0
+
+  embed_mlp:
+    enabled: true
+    encoder: "sentence-transformers/all-MiniLM-L6-v2"
+    hidden_dim: 256
+    dropout: 0.3
+    epochs: 40
+    batch_size: 64
+    lr: 0.001
+
+  distilbert:
+    enabled: true
+    model_name: "distilbert-base-uncased"
+    max_length: 512
+    epochs: 3
+    batch_size: 8
+    lr: 0.00002
+    grad_accum: 2
+
+  mnl_baseline:
+    enabled: true
+    C: 1.0
+    max_iter: 200
+
+  hier_bayes:
+    enabled: true
+    draws: 1000
+    tune: 1000
+    chains: 4
+    target_accept: 0.9
+    max_tree_depth: 10
+    seed: 42
+    chain_method: "vectorized"
+    save_diagnostics: true
+    save_model_pickle: true
+
+  consensus:
+    enabled: true
+  majority:
+    enabled: true
+
+output:
+  results_dir: "results_corrected_twoway"

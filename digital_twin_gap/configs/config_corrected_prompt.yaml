@@ -1,0 +1,86 @@
+# =============================================================================
+# Digital-Twin Gap Study — CORRECTED SPLIT: prompt-blocked (leakage fix)
+# =============================================================================
+# See the LEAKAGE NOTE at the top of src/splits.py and
+# docs/hierarchical_twin_spec.md's leakage-audit section: the original
+# `split_mode: "group"` blocks agents by (agent, category) and humans by
+# participant_id, but blocks on neither source's TASK -- so 100% of test rows
+# in both sources have their exact prompt sitting in train, and a non-learning
+# prompt->modal-label lookup recovers 93-99% of the reported TF-IDF accuracy.
+#
+# This config switches to `split_mode: "prompt"`: both sources are blocked on
+# the prompt itself, so a held-out task is unseen by EVERY decision-maker in
+# training. Verified split composition: agent 307/77 prompts -> 1798/456 rows,
+# all 6 agents and all 4 categories on both sides; human 115/29 prompts ->
+# 4805/1211 rows, all 4 categories on both sides (this reintroduces some
+# participant overlap -- see configs/config_corrected_twoway.yaml for the
+# fully-blocked human split, at the cost of a much smaller test set).
+#
+# All 8 architectures run here, including the two new permanent reference
+# baselines (`consensus`, `majority`) whose collapse to identical accuracy is
+# the direct, automatic proof that the leak is closed on this split.
+#
+# Writes to results_corrected_prompt/ — no existing results/* directory is
+# ever touched by this file.
+# =============================================================================
+
+data:
+  agentic_root: "data/raw/Agentic response"
+  human_files:
+    - "data/raw/human/llm_train_human.jsonl"
+    - "data/raw/human/llm_val_human.jsonl"
+  unified_dir: "data/unified"
+  test_size: 0.2
+  seed: 42
+  split_mode: "prompt"
+
+models:
+  tfidf_logreg:
+    enabled: true
+    max_features: 20000
+    ngram_max: 2
+    C: 4.0
+
+  embed_mlp:
+    enabled: true
+    encoder: "sentence-transformers/all-MiniLM-L6-v2"
+    hidden_dim: 256
+    dropout: 0.3
+    epochs: 40
+    batch_size: 64
+    lr: 0.001
+
+  distilbert:
+    enabled: true
+    model_name: "distilbert-base-uncased"
+    max_length: 512
+    epochs: 3
+    batch_size: 8
+    lr: 0.00002
+    grad_accum: 2
+
+  mnl_baseline:
+    enabled: true
+    C: 1.0
+    max_iter: 200
+
+  hier_bayes:
+    enabled: true
+    draws: 1000
+    tune: 1000
+    chains: 4
+    target_accept: 0.9
+    max_tree_depth: 10
+    seed: 42
+    chain_method: "vectorized"
+    save_diagnostics: true
+    save_model_pickle: true
+
+  # Reference baselines (see src/model_consensus.py, src/model_majority.py).
+  consensus:
+    enabled: true
+  majority:
+    enabled: true
+
+output:
+  results_dir: "results_corrected_prompt"

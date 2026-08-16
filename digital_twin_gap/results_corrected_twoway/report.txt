@@ -1,0 +1,69 @@
+DIGITAL-TWIN GAP REPORT
+============================================================
+
+Accuracy of predicting the chosen product option (A/B/C/D).
+Random baseline for a 4-way choice = 0.25.
+
+[tfidf_logreg]
+  Agent twin on agents (matched)   : 0.5636
+  Human twin on humans (matched)   : 0.3223
+  Agent twin on humans (transfer)  : 0.3967
+  Human twin on agents (transfer)  : 0.3969
+  GAP on humans (matched-transfer) : -0.0744
+  GAP on agents (matched-transfer) : +0.1667
+
+[embed_mlp]
+  Agent twin on agents (matched)   : 0.5088
+  Human twin on humans (matched)   : 0.3099
+  Agent twin on humans (transfer)  : 0.3182
+  Human twin on agents (transfer)  : 0.3158
+  GAP on humans (matched-transfer) : -0.0083
+  GAP on agents (matched-transfer) : +0.1930
+
+[distilbert]
+  Agent twin on agents (matched)   : 0.4364
+  Human twin on humans (matched)   : 0.2975
+  Agent twin on humans (transfer)  : 0.3223
+  Human twin on agents (transfer)  : 0.3004
+  GAP on humans (matched-transfer) : -0.0248
+  GAP on agents (matched-transfer) : +0.1360
+
+[mnl_baseline]
+  Agent twin on agents (matched)   : 0.4518
+  Human twin on humans (matched)   : 0.2975
+  Agent twin on humans (transfer)  : 0.3719
+  Human twin on agents (transfer)  : 0.3421
+  GAP on humans (matched-transfer) : -0.0744
+  GAP on agents (matched-transfer) : +0.1096
+
+[hier_bayes]
+  Agent twin on agents (matched)   : 0.4649
+  Human twin on humans (matched)   : 0.3347
+  Agent twin on humans (transfer)  : 0.3264
+  Human twin on agents (transfer)  : 0.3114
+  GAP on humans (matched-transfer) : +0.0083
+  GAP on agents (matched-transfer) : +0.1535
+
+[consensus]
+  Agent twin on agents (matched)   : 0.2544
+  Human twin on humans (matched)   : 0.3223
+  Agent twin on humans (transfer)  : 0.3223
+  Human twin on agents (transfer)  : 0.2544
+  GAP on humans (matched-transfer) : +0.0000
+  GAP on agents (matched-transfer) : +0.0000
+
+[majority]
+  Agent twin on agents (matched)   : 0.2544
+  Human twin on humans (matched)   : 0.3223
+  Agent twin on humans (transfer)  : 0.3223
+  Human twin on agents (transfer)  : 0.2544
+  GAP on humans (matched-transfer) : +0.0000
+  GAP on agents (matched-transfer) : +0.0000
+
+INTERPRETATION
+------------------------------------------------------------
+A large positive gap means a twin built from one population is a poor
+stand-in for the other. If agent-matched accuracy is much higher than
+human-matched accuracy, it means LLM agents make far more predictable
+(consistent, rule-like) choices than real people do -- so an 'agentic
+digital twin' overstates how well it would model human consumers.
