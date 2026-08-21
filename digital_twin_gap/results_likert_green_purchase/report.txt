@@ -1,0 +1,21 @@
+REAL vs SYNTHETIC LIKERT RESPONSE GAP -- green_purchase_behavior
+============================================================
+
+real n=253  synthetic n=400  items=28
+
+Per-item distributional gap (top 5 by JSD):
+  GPB5     JSD=0.3211  q=1.724e-31  real_mean=5.68  synth_mean=4.54
+  EC1      JSD=0.2731  q=1.195e-16  real_mean=5.78  synth_mean=5.31
+  GPB6     JSD=0.2696  q=2.552e-29  real_mean=5.49  synth_mean=4.32
+  GPB2     JSD=0.2670  q=3.445e-31  real_mean=5.22  synth_mean=3.90
+  GPB3     JSD=0.2546  q=1.644e-20  real_mean=5.21  synth_mean=4.27
+
+Mean JSD across all items: 0.1152 (median 0.0669, max 0.3211)
+Items with a significant real-vs-synthetic difference after BH correction (q<0.05): 19/28 (67.9%)
+
+Classifier two-sample test: held-out AUC = 0.8841 (permutation p = 0.0010), balanced accuracy = 0.8207
+
+LIMITATION: no generator script for this dataset was found anywhere in
+this repo (verified by a full-repo search) -- these numbers describe the
+empirical gap only; they do not validate a known synthetic model's stated
+assumptions. See docs/likert_side_study.md.

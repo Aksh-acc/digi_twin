@@ -201,6 +201,72 @@ isn't leaking task identity. Under the original leaky split it alone recovers
 ### (7) `majority` — always predict the training set's modal label
 `src/model_majority.py`. The floor every other architecture must clear.
 
+### (8) `tabular_llm` — attention-based deep tabular choice model
+`src/model_tabular_llm.py`. The **tabular** counterpart to the text twins: it
+consumes the same engineered per-option feature table the discrete-choice models
+use (price / rating / review z-scores + within-row ranks, plus a category
+one-hot), but processes it with a small **Transformer** — each of the 4 options
+becomes a feature *token*, and cross-option self-attention (the LLM mechanism)
+lets it learn non-linear comparisons a linear MNL cannot ("cheapest *and* well
+rated", "much cheaper than the next option"). Trained from scratch, no text, no
+pretrained weights; CPU-fast and deterministic given the seed.
+
+> ⚠ Its first reported number (agent→agent ≈ 0.65, "strongest twin in the
+> study") was measured under the default leaky `"group"` split and does not
+> hold up: even though it never sees raw text, it's high-capacity enough to
+> memorize near-unique price/rating/review-count *combinations* per task —
+> the same failure mode as the text models, in a different disguise. Under
+> `split_mode: "prompt"` its agent→agent accuracy drops to **0.5526** (vs.
+> `tfidf_logreg`'s corrected 0.5636 — no longer the strongest) and
+> `gap_on_human` flips from +0.0648 to **−0.0017**, the same inversion the
+> text architectures show. See
+> [docs/hierarchical_twin_spec.md §0.3](docs/hierarchical_twin_spec.md#03-corrected-split-results)
+> for the full corrected numbers under both split designs.
+
+### (9) `cognitive_decay` — choice model with within-session fatigue
+`src/model_cognitive_decay.py`. An MNL whose decision *sharpness* (inverse
+temperature) decays with the trial index:
+`s(t) = softplus(a)·exp(−δ·t_norm) + floor`. The fitted **decay rate δ** is the
+scientific output — it measures how much a decision-maker drifts toward noise
+over a session. It uses the trial ordering now preserved end-to-end: humans get
+their within-session trial index (parsed from `task_id`, e.g. `…_S2_T13` → trial
+13); agents get a global item index (parsed from the `NO###` file ordering).
+Run `python -m src.decay_analysis --config configs/config_corrected_prompt.yaml
+--out results_cognitive_decay_corrected` for the per-source and per-agent
+decay-rate tables and the decision-sharpness curves. **Use the corrected
+config** — the original `results_cognitive_decay/` (default `config.yaml`)
+predates the leakage fix and also hit a Windows-only crash writing the `δ`
+character with the platform's default encoding (both fixed; kept only as a
+historical/leaky-split artifact). Corrected finding, same direction as the
+original: agent decision sharpness starts ~5× higher than human (27.7 vs
+5.9) and decays similarly in relative terms (21% vs 7.5% drop); among agents
+**ChatGPT O3 shows the strongest within-run decay** (δ=0.077, 91% drop)
+**while GPT-5.5 and Grok show none** (δ=0.000, at the boundary — the pooled-
+agent and GPT-5.5 fits didn't fully converge, consistent with a genuinely
+near-zero effect there rather than an optimizer failure).
+
+### Separate experiment — entropy introduced in training
+`src/training_entropy.py` (not part of the transfer matrix). Injects a
+controlled amount of label noise (entropy) into the **training** labels while
+keeping test labels clean, then plots matched-cell accuracy vs the injected
+noise for each twin and source. It isolates how much of the human–agent gap is
+explained by the human target simply being higher-entropy: agent-trained twins
+collapse steeply as noise rises (they rely on clean, low-entropy supervision),
+whereas human-trained twins barely move (their labels are already near-noise).
+Run `python -m src.training_entropy --config configs/config_corrected_prompt.yaml
+--models tfidf_logreg tabular_llm mnl_baseline cognitive_decay --seeds 3`
+(outputs in `results_training_entropy_corrected/`) — the full default sweep
+(6 noise levels × 4 models × 2 sources × 3 seeds), under the corrected split.
+An earlier partial run (1 model, 2 noise levels, 2 seeds, leaky split) has
+been removed. Clean-baseline training-label entropy is nearly identical for
+both sources (agent 1.994 bits, human 1.998 bits, both near the 2.0 max) —
+so the *raw* entropy of the training target barely distinguishes the two
+populations; what differs is how each **architecture** responds as more
+noise is injected: `tfidf_logreg` degrades steeply (0.56→0.39 on agent — it
+needs clean supervision), while `cognitive_decay` is essentially flat
+(0.36→0.38) — it was never exploiting fine label structure, consistent with
+its low-but-honest baseline accuracy.
+
 Plus a standalone **Human-Agent Gap Analyzer** (`src/gap_analysis.py`) that
 quantifies the population gap directly rather than only through accuracy —
 empirical entropy / Herfindahl concentration per group, inter-agent Fleiss' κ,
@@ -240,6 +306,15 @@ python -m src.analyze --config configs/config_corrected_prompt.yaml
 python -m src.gap_analysis --config configs/config_hier_bayes.yaml --out_dir results_gap_analysis
 python -m src.behavioral_profiles --hier_bayes_dir results_corrected_prompt --out_dir results_behavioral_profiles
 python -m src.c2st --config configs/config_corrected_prompt.yaml --out_dir results_c2st
+
+# 5. New additions
+#    (a) tabular LLM + cognitive-decay run in the transfer matrix like any model:
+python -m src.run_all --config configs/config.yaml --models tabular_llm cognitive_decay
+#    (b) cognitive-decay scientific output (decay rates + sharpness curves):
+python -m src.decay_analysis --config configs/config.yaml
+#    (c) entropy-introduced-in-training sweep (separate experiment):
+python -m src.training_entropy --config configs/config.yaml \
+       --models tfidf_logreg tabular_llm mnl_baseline cognitive_decay --seeds 3
 ```
 Or just: `bash run_all.sh` (runs the original 3-architecture, leaky-split
 config — kept only for backward compatibility; prefer the commands above).
@@ -290,15 +365,23 @@ divergences — check these before trusting any `hier_bayes` number).
 
 | Directory | What's in it |
 |---|---|
-| `results/` | Original leaky-split run, 3 architectures — historical only |
+| `results/` | Leaky-split (`"group"`) run, 5 architectures (`tfidf_logreg`, `embed_mlp`, `distilbert`, `tabular_llm`, `cognitive_decay`) — historical only, see Final verdict |
 | `results_distilbert_tuned/` | `distilbert` with more epochs / lower LR, leaky split |
-| `results_mnl_baseline/`, `results_hier_bayes/` | Leaky-split runs of the two new discrete-choice architectures |
-| `results_corrected_prompt/` | **All 7 architectures, prompt-blocked split — primary corrected result** |
-| `results_corrected_twoway/` | All 7 architectures, strict two-way-blocked human split |
+| `results_mnl_baseline/`, `results_hier_bayes/` | Leaky-split runs of the two discrete-choice architectures |
+| `results_corrected_prompt/` | **All 9 architectures, prompt-blocked split — primary corrected result** |
+| `results_corrected_twoway/` | All 9 architectures, strict two-way-blocked human split |
 | `results_full_comparison/` | 6-architecture merge of the leaky-split runs (historical) |
-| `results_gap_analysis/` | Entropy/HHI/Fleiss' κ/JSD gap analyzer output |
+| `results_gap_analysis/` | Entropy/HHI/Fleiss' κ (split-independent) + JSD (Tier 3, now re-run against `results_corrected_prompt/`'s `hier_bayes` posteriors — an earlier version of this directory used the leaky-split posteriors) |
 | `results_behavioral_profiles/` | Per-agent price/rating sensitivity + decision temperature |
-| `results_c2st/` | Classifier two-sample test result |
+| `results_c2st/` | Classifier two-sample test result (corrected split) |
+| `results_cognitive_decay/` | `decay_analysis.py`, leaky split — historical only, see §3 |
+| `results_cognitive_decay_corrected/` | **`decay_analysis.py`, corrected split — trust this one** |
+| `results_training_entropy_corrected/` | **`training_entropy.py`, full sweep, corrected split — trust this one** |
+
+`run_all.py` **merges** with whatever is already in a `results_dir/all_results.json`
+rather than overwriting it — running `--models X` only ever adds/updates `X`'s
+row, it never deletes other architectures' rows from that directory. Pass
+`--fresh` to explicitly discard prior results in that directory instead.
 
 ---
 
@@ -306,7 +389,7 @@ divergences — check these before trusting any `hier_bayes` number).
 
 **See the Final verdict at the top of this README, and
 [docs/hierarchical_twin_spec.md §0.3](docs/hierarchical_twin_spec.md#03-corrected-split-results)
-for the complete 7-architecture corrected tables under both split designs.**
+for the complete 9-architecture corrected tables under both split designs.**
 Headline corrected numbers (`results_corrected_prompt/`, random baseline =
 0.25):
 
@@ -317,6 +400,8 @@ Headline corrected numbers (`results_corrected_prompt/`, random baseline =
 | distilbert | 0.461 | 0.358 | +0.057 |
 | mnl_baseline | 0.452 | 0.355 | +0.017 |
 | hier_bayes | 0.465 | 0.379 | +0.066 |
+| tabular_llm | 0.553 | 0.366 | **−0.002** |
+| cognitive_decay | 0.364 | 0.347 | +0.026 |
 | consensus / majority | 0.254 | 0.304 | 0.000 |
 
 ---
@@ -335,7 +420,7 @@ digital_twin_gap/
 │   ├── config_distilbert_tuned.yaml
 │   ├── config_mnl_baseline.yaml
 │   ├── config_hier_bayes.yaml / config_hier_bayes_smoke.yaml
-│   ├── config_corrected_prompt.yaml # <- recommended: task-blocked split, all 7 architectures
+│   ├── config_corrected_prompt.yaml # <- recommended: task-blocked split, all 9 architectures
 │   ├── config_corrected_twoway.yaml # <- strictest human split
 │   └── config_full_comparison.yaml
 ├── notebooks/
@@ -351,12 +436,16 @@ digital_twin_gap/
 │   ├── model_hier_bayes.py          # architecture 5 -- hierarchical Bayesian twin (NumPyro)
 │   ├── model_consensus.py           # architecture 6 -- memorization-ceiling reference baseline
 │   ├── model_majority.py            # architecture 7 -- floor reference baseline
+│   ├── model_tabular_llm.py         # architecture 8 -- attention/Transformer over tabular features
+│   ├── model_cognitive_decay.py     # architecture 9 -- MNL with within-session sharpness decay
 │   ├── metrics.py                   # accuracy, macro-F1, per-agent, gap
 │   ├── gap_analysis.py              # entropy/HHI/Fleiss' kappa/JSD human-agent gap analyzer
 │   ├── behavioral_profiles.py       # per-agent price/rating sensitivity + decision temperature
 │   ├── c2st.py                      # classifier two-sample test (agent vs human, structured features)
+│   ├── decay_analysis.py            # per-source/per-agent decay-rate + sharpness report
+│   ├── training_entropy.py          # standalone: accuracy vs. injected training-label noise
 │   ├── merge_results.py             # safely merges multiple results dirs into one comparison
-│   ├── run_all.py                   # runs the full transfer matrix (per-architecture fault isolation)
+│   ├── run_all.py                   # runs the full transfer matrix (merges with existing results_dir; --fresh to discard)
 │   └── analyze.py                   # figures + text report
 ├── data/
 │   ├── raw/                         # input data (agent xlsx + human jsonl)
@@ -376,3 +465,22 @@ matrix, metrics, gap computation, and plots all pick it up automatically.
 **Use a task-blocked split** (`split_mode: "prompt"` or `"twoway"`) in your
 config — see the Final verdict above for why the default `"group"` mode
 cannot be trusted for accuracy claims.
+
+---
+
+## 10. Side-study: real-vs-synthetic Likert response gap
+
+A **decoupled side-study**, unrelated to the agent-vs-human shopping-choice
+task above — different data, different question, no train/test/fit. Uses
+mentor-provided consumer-behavior survey data (`Datasets_total/`, not part of
+the main pipeline) to ask: does a hand-coded synthetic-data generator's
+output reproduce the *distribution* of the real human population it stands
+in for? Two matched real/synthetic Likert-survey pairs
+(`green_purchase_behavior`, `non_alcoholic_beverages`) show a real, robust
+gap that replicates across both — real and synthetic respondents are
+classifiably distinguishable (AUC 0.88 and 0.83, both p=0.001) on their raw
+item-level response distributions, well short of the ~1.0 that would suggest
+a trivial leak. Full method, exact metrics, limitations (no generator script
+was found for either dataset, so this only describes the empirical gap, not
+a validation of a known model), and reproduction commands:
+**[docs/likert_side_study.md](docs/likert_side_study.md)**.

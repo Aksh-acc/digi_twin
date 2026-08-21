@@ -1,0 +1,13 @@
+{
+  "dataset_name": "green_purchase_behavior",
+  "n_items": 28,
+  "real_n": 253,
+  "synth_n": 400,
+  "mean_JSD": 0.11521258645426281,
+  "median_JSD": 0.06693218569174654,
+  "max_JSD": 0.3211395500215418,
+  "n_items_q_below_0.05": 19,
+  "frac_items_q_below_0.05": 0.6785714285714286,
+  "c2st_auc": 0.8840686274509804,
+  "c2st_permutation_p_value": 0.000999000999000999
+}

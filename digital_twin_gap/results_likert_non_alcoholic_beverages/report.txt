@@ -1,0 +1,21 @@
+REAL vs SYNTHETIC LIKERT RESPONSE GAP -- non_alcoholic_beverages
+============================================================
+
+real n=436  synthetic n=400  items=25
+
+Per-item distributional gap (top 5 by JSD):
+  MAR2     JSD=0.0909  q=3.598e-19  real_mean=3.87  synth_mean=3.31
+  MAR1     JSD=0.0736  q=1.691e-11  real_mean=3.74  synth_mean=3.33
+  KNO2     JSD=0.0716  q=2.37e-16  real_mean=3.79  synth_mean=3.22
+  CON2     JSD=0.0610  q=1.787e-08  real_mean=3.84  synth_mean=4.28
+  IMA2     JSD=0.0610  q=3.273e-13  real_mean=3.88  synth_mean=3.46
+
+Mean JSD across all items: 0.0372 (median 0.0326, max 0.0909)
+Items with a significant real-vs-synthetic difference after BH correction (q<0.05): 20/25 (80.0%)
+
+Classifier two-sample test: held-out AUC = 0.8270 (permutation p = 0.0010), balanced accuracy = 0.7511
+
+LIMITATION: no generator script for this dataset was found anywhere in
+this repo (verified by a full-repo search) -- these numbers describe the
+empirical gap only; they do not validate a known synthetic model's stated
+assumptions. See docs/likert_side_study.md.

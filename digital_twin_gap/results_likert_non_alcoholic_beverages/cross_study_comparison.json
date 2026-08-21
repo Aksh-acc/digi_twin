@@ -1,0 +1,16 @@
+{
+  "dataset_a": "green_purchase_behavior",
+  "dataset_b": "non_alcoholic_beverages",
+  "mean_JSD_a": 0.11521258645426281,
+  "mean_JSD_b": 0.037228904927017824,
+  "c2st_auc_a": 0.8840686274509804,
+  "c2st_auc_b": 0.8269886363636364,
+  "c2st_p_value_a": 0.000999000999000999,
+  "c2st_p_value_b": 0.000999000999000999,
+  "frac_items_significant_a": 0.6785714285714286,
+  "frac_items_significant_b": 0.8,
+  "both_auc_above_chance": true,
+  "both_significant": true,
+  "both_majority_items_differ": true,
+  "verdict": "REPLICATES: both 'non_alcoholic_beverages' and 'green_purchase_behavior' show a classifier two-sample test AUC significantly above chance (p<0.05) -- real and synthetic response distributions are distinguishable in both independently-chosen consumer-behavior domains."
+}

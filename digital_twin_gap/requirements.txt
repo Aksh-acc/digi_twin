@@ -23,6 +23,10 @@ seaborn>=0.12.0
 # fine on CPU -- this model's runtime is leapfrog-step-bound, not FLOP-bound,
 # so GPU acceleration isn't worth pursuing here. See
 # docs/hierarchical_twin_spec.md for the full model spec.
-scipy>=1.10.0
+scipy>=1.11.0
 numpyro>=0.15.0
 arviz>=0.17.0
+
+# scipy floor bumped 1.10 -> 1.11 for scipy.stats.false_discovery_control
+# (Benjamini-Hochberg correction), used by the Likert side-study
+# (src/likert_gap_analysis.py, docs/likert_side_study.md) -- no new package.

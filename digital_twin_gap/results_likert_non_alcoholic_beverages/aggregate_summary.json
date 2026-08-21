@@ -1,0 +1,13 @@
+{
+  "dataset_name": "non_alcoholic_beverages",
+  "n_items": 25,
+  "real_n": 436,
+  "synth_n": 400,
+  "mean_JSD": 0.037228904927017824,
+  "median_JSD": 0.032557154288821055,
+  "max_JSD": 0.09091957616586385,
+  "n_items_q_below_0.05": 20,
+  "frac_items_q_below_0.05": 0.8,
+  "c2st_auc": 0.8269886363636364,
+  "c2st_permutation_p_value": 0.000999000999000999
+}
