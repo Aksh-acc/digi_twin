@@ -1,0 +1,7 @@
+agent,decay_rate_delta,sharpness_start,sharpness_end,sharpness_drop_frac,n_train
+ChatGPT GPT 5.5,0.0000,55.9124,55.9124,0.0000,307
+ChatGPT O3,0.0770,136.8370,11.7670,0.9140,307
+Claude Opus 4.6,0.0176,80.9093,46.1453,0.4297,307
+Claude Opus 4.8,0.0000,75.9000,75.8147,0.0011,307
+Claude Sonnet 4.6,0.0095,76.0299,56.1755,0.2611,307
+Grok 4.2,0.0000,59.5267,59.5267,0.0000,263

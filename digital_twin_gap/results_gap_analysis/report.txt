@@ -14,8 +14,8 @@ Tier 2 -- inter-agent agreement (n_items=334, n_raters=6):
   Fleiss' kappa = 0.3505 (fair, Landis & Koch scale)
 
 Tier 3 -- model-based flagship gap metric D_HA = JSD(P_human_twin, P_agent_twin):
-  on agent_test: mean JSD = 0.0192  median = 0.0146  (n=480)
-  on human_test: mean JSD = 0.0503  median = 0.0367  (n=1203)
+  on agent_test: mean JSD = 0.0903  median = 0.0435  (n=456)
+  on human_test: mean JSD = 0.0580  median = 0.0539  (n=1211)
 
 INTERPRETATION
 ------------------------------------------------------------

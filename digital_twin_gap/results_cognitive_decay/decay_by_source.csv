@@ -1,0 +1,3 @@
+source,decay_rate_delta,sharpness_start,sharpness_end,sharpness_drop_frac,n_train
+agent,0.0083,20.1182,15.4714,0.2310,1774
+human,0.0253,1.0300,0.9604,0.0676,4813
