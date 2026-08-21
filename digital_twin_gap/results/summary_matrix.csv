@@ -1,8 +1,8 @@
 architecture,cell,accuracy,macro_f1,n,train_seconds
-tfidf_logreg,agent->agent,0.6646,0.6619,480,5.1
-tfidf_logreg,agent->human,0.3832,0.3826,1203,5.1
-tfidf_logreg,human->agent,0.4271,0.4289,480,8.3
-tfidf_logreg,human->human,0.4331,0.4328,1203,8.3
+tfidf_logreg,agent->agent,0.6646,0.6619,480,3.0
+tfidf_logreg,agent->human,0.3832,0.3826,1203,3.0
+tfidf_logreg,human->agent,0.4271,0.4289,480,5.3
+tfidf_logreg,human->human,0.4331,0.4328,1203,5.3
 embed_mlp,agent->agent,0.5521,0.5507,480,66.9
 embed_mlp,agent->human,0.3591,0.3497,1203,66.9
 embed_mlp,human->agent,0.4271,0.4041,480,26.7
@@ -11,3 +11,11 @@ distilbert,agent->agent,0.4646,0.3579,480,107.3
 distilbert,agent->human,0.2984,0.2591,1203,107.3
 distilbert,human->agent,0.2875,0.2646,480,179.1
 distilbert,human->human,0.4431,0.4361,1203,179.1
+tabular_llm,agent->agent,0.6479,0.6458,480,23.6
+tabular_llm,agent->human,0.3749,0.3741,1203,23.6
+tabular_llm,human->agent,0.4938,0.4879,480,57.7
+tabular_llm,human->human,0.4397,0.4382,1203,57.7
+cognitive_decay,agent->agent,0.3708,0.3713,480,0.3
+cognitive_decay,agent->human,0.3716,0.3712,1203,0.3
+cognitive_decay,human->agent,0.3229,0.3234,480,0.1
+cognitive_decay,human->human,0.3965,0.3960,1203,0.1

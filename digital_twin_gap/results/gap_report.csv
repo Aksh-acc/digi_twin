@@ -2,3 +2,5 @@ architecture,acc_agent_matched,acc_human_matched,acc_agent_on_human,acc_human_on
 tfidf_logreg,0.6646,0.4331,0.3832,0.4271,+0.0499,+0.2375
 embed_mlp,0.5521,0.4256,0.3591,0.4271,+0.0665,+0.1250
 distilbert,0.4646,0.4431,0.2984,0.2875,+0.1446,+0.1771
+tabular_llm,0.6479,0.4397,0.3749,0.4938,+0.0648,+0.1542
+cognitive_decay,0.3708,0.3965,0.3716,0.3229,+0.0249,+0.0479

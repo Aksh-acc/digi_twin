@@ -63,5 +63,39 @@ models:
     lr: 0.00002
     grad_accum: 2
 
+  # (4) Tabular LLM -- attention-based deep tabular choice model.
+  #     Consumes the engineered per-option features (not text) and learns
+  #     non-linear cross-option comparisons via a small Transformer. CPU-fast.
+  tabular_llm:
+    enabled: true
+    d_model: 64
+    n_heads: 4
+    n_layers: 2
+    dropout: 0.1
+    epochs: 60
+    batch_size: 128
+    lr: 0.001
+    weight_decay: 0.0001
+    seed: 42
+
+  # (4b) Fixed-effects discrete-choice MNL. Disabled by default here (it has a
+  #      dedicated config in configs/config_mnl_baseline.yaml), but the block is
+  #      present so --models mnl_baseline and the entropy sweep can find its
+  #      hyperparameters without a separate config.
+  mnl_baseline:
+    enabled: false
+    C: 1.0
+    max_iter: 200
+
+  # (5) Cognitive-decay choice model -- MNL with a trial-dependent decision
+  #     sharpness s(t) = softplus(a)*exp(-delta*t_norm)+floor. `delta` is the
+  #     fitted cognitive-decay (fatigue) rate, reported per training source.
+  cognitive_decay:
+    enabled: true
+    C: 1.0              # inverse L2 strength on the utility coefficients
+    trial_scale: 12.0   # normaliser for the trial index (~trials per session)
+    sharpness_floor: 0.05
+    max_iter: 300
+
 output:
   results_dir: "results"

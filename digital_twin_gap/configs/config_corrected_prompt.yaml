@@ -82,5 +82,24 @@ models:
   majority:
     enabled: true
 
+  tabular_llm:
+    enabled: true
+    d_model: 64
+    n_heads: 4
+    n_layers: 2
+    dropout: 0.1
+    epochs: 60
+    batch_size: 128
+    lr: 0.001
+    weight_decay: 0.0001
+    seed: 42
+
+  cognitive_decay:
+    enabled: true
+    C: 1.0
+    trial_scale: 12.0
+    sharpness_floor: 0.05
+    max_iter: 300
+
 output:
   results_dir: "results_corrected_prompt"

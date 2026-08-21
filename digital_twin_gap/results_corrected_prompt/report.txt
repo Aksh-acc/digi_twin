@@ -60,6 +60,22 @@ Random baseline for a 4-way choice = 0.25.
   GAP on humans (matched-transfer) : +0.0000
   GAP on agents (matched-transfer) : +0.0000
 
+[tabular_llm]
+  Agent twin on agents (matched)   : 0.5526
+  Human twin on humans (matched)   : 0.3658
+  Agent twin on humans (transfer)  : 0.3675
+  Human twin on agents (transfer)  : 0.4934
+  GAP on humans (matched-transfer) : -0.0017
+  GAP on agents (matched-transfer) : +0.0592
+
+[cognitive_decay]
+  Agent twin on agents (matched)   : 0.3640
+  Human twin on humans (matched)   : 0.3468
+  Agent twin on humans (transfer)  : 0.3212
+  Human twin on agents (transfer)  : 0.3728
+  GAP on humans (matched-transfer) : +0.0256
+  GAP on agents (matched-transfer) : -0.0088
+
 INTERPRETATION
 ------------------------------------------------------------
 A large positive gap means a twin built from one population is a poor

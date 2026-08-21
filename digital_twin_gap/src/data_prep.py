@@ -46,6 +46,32 @@ VALID = {"A", "B", "C", "D", "NONE"}
 # --------------------------------------------------------------------------- #
 # Helpers
 # --------------------------------------------------------------------------- #
+_NO_OFFSET_RE = re.compile(r"NO\s*0*(\d+)", re.IGNORECASE)
+
+
+def _parse_no_offset(rel_path):
+    """First NO### in an agent filename -> starting item number (int) or None.
+    e.g. 'agent_prompts_NO101-NO150_filled (1).xlsx' -> 101."""
+    m = _NO_OFFSET_RE.search(rel_path)
+    return int(m.group(1)) if m else None
+
+
+_SESSION_TRIAL_RE = re.compile(r"_S(\d+)_T(\d+)\s*$")
+
+
+def _parse_session_trial(task_id):
+    """Parse '..._S{session}_T{trial}' out of a human task_id.
+    Returns (session:int|None, trial:int|None). Agent rows have no task_id
+    and get (None, None) -- their sequence index is assigned separately in
+    load_agentic() from the NO### filename ordering."""
+    if not task_id:
+        return None, None
+    m = _SESSION_TRIAL_RE.search(str(task_id))
+    if not m:
+        return None, None
+    return int(m.group(1)), int(m.group(2))
+
+
 def _norm_choice(v):
     """Normalise a raw chosen_option cell to one of A/B/C/D/NONE, else None."""
     if v is None:
@@ -129,7 +155,14 @@ def load_agentic(agentic_root):
                 choice_col = c
                 break
 
-        for _, row in df.iterrows():
+        # Recover the item-number offset from the filename (e.g.
+        # "..._NO101-NO150_filled.xlsx" -> starts at 101). Combined with the
+        # within-file row position this gives each agent decision a stable
+        # global order index, the agent analogue of a human trial number.
+        # Used only by the cognitive-decay model; ignored by every other model.
+        base_no = _parse_no_offset(rel)
+
+        for pos, (_, row) in enumerate(df.iterrows()):
             label = _norm_choice(row[choice_col]) if choice_col else None
             if label is None and "raw_response" in df.columns:
                 label = _choice_from_raw_response(row.get("raw_response"))
@@ -141,6 +174,7 @@ def load_agentic(agentic_root):
                 # fall back to raw_response context is not a usable prompt; skip
                 continue
 
+            item_no = (base_no + pos) if base_no is not None else None
             records.append(
                 {
                     "prompt": prompt,
@@ -148,6 +182,11 @@ def load_agentic(agentic_root):
                     "source": "agent",
                     "group": agent,
                     "category": _category_from_prompt(prompt),
+                    # Agent sequence metadata (mirrors human session/trial).
+                    "task_id": None,
+                    "completion_status": None,
+                    "session": None,
+                    "trial": item_no,   # global item index within this agent
                 }
             )
     return records
@@ -174,6 +213,14 @@ def load_human(human_files):
                     label = _norm_choice(assistant)
                 if label not in VALID:
                     continue
+                # Preserve the trial-ordering metadata carried by task_id
+                # (e.g. "EAR_TN_S2_T13" -> session 2, trial 13). The cognitive
+                # decay model needs the within-participant trial index to model
+                # fatigue/decay over successive decisions. These keys are
+                # ADDITIVE: every existing model ignores them, so nothing else
+                # in the pipeline changes.
+                task_id = ex.get("task_id")
+                sess, trial = _parse_session_trial(task_id)
                 records.append(
                     {
                         "prompt": prompt,
@@ -181,6 +228,10 @@ def load_human(human_files):
                         "source": "human",
                         "group": ex.get("participant_id", "unknown"),
                         "category": _category_from_prompt(prompt),
+                        "task_id": task_id,
+                        "completion_status": ex.get("completion_status"),
+                        "session": sess,      # int or None
+                        "trial": trial,       # int or None (1-based within session)
                     }
                 )
     return records

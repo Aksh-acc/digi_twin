@@ -27,3 +27,11 @@ majority,agent->agent,0.2544,0.1014,456,0.0
 majority,agent->human,0.3223,0.1219,242,0.0
 majority,human->agent,0.2544,0.1014,456,0.0
 majority,human->human,0.3223,0.1219,242,0.0
+tabular_llm,agent->agent,0.5526,0.5488,456,12.9
+tabular_llm,agent->human,0.4256,0.3953,242,12.9
+tabular_llm,human->agent,0.4232,0.4042,456,20.2
+tabular_llm,human->human,0.3512,0.3349,242,20.2
+cognitive_decay,agent->agent,0.3640,0.3653,456,0.4
+cognitive_decay,agent->human,0.3017,0.2852,242,0.4
+cognitive_decay,human->agent,0.3728,0.3758,456,0.5
+cognitive_decay,human->human,0.2810,0.2809,242,0.5

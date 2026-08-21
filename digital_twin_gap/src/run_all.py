@@ -22,6 +22,11 @@ Everything is written to results/:
 Run (after data_prep):
     python -m src.run_all --config configs/config.yaml
     python -m src.run_all --config configs/config.yaml --models tfidf_logreg
+
+Running with --models a subset MERGES with whatever architectures are already
+in results_dir/all_results.json (loaded at startup, then updated/added to as
+each selected architecture completes) -- it does NOT erase architectures you
+didn't select this time. Pass --fresh to explicitly start from empty instead.
 """
 
 import argparse
@@ -48,6 +53,13 @@ MODEL_REGISTRY = {
     # discrete-choice MNL) and Model 2 (hierarchical Bayesian choice model).
     "mnl_baseline": "src.model_mnl_baseline",
     "hier_bayes": "src.model_hier_bayes",
+    # Tabular LLM: attention-based deep tabular choice model over the engineered
+    # per-option features (non-linear cross-option comparisons; LLM mechanism,
+    # trained from scratch, no text).
+    "tabular_llm": "src.model_tabular_llm",
+    # Cognitive-decay choice model: MNL whose decision sharpness decays with the
+    # trial index, modelling within-session fatigue. Reports a decay rate delta.
+    "cognitive_decay": "src.model_cognitive_decay",
     # Reference baselines. `consensus` is the per-task memorisation ceiling
     # (a prompt->modal-label lookup, no learning); `majority` is the floor.
     # Keeping both as permanent rows makes task-identity leakage visible in
@@ -104,6 +116,16 @@ def compute_gaps(cells):
         "gap_on_human": hh - ah,          # cost of using an agent twin for humans
         "gap_on_agent": aa - ha,          # cost of using a human twin for agents
     }
+
+
+def load_existing_results(results_dir):
+    """Load results_dir/all_results.json if present, else {}. Used to MERGE
+    with (not overwrite) whatever this run computes -- see main()."""
+    path = os.path.join(results_dir, "all_results.json")
+    if not os.path.exists(path):
+        return {}
+    with open(path) as f:
+        return json.load(f)
 
 
 def write_outputs(all_results, results_dir):
@@ -164,6 +186,20 @@ def main():
         default=None,
         help="Subset of model keys to run (default: all enabled in config).",
     )
+    ap.add_argument(
+        "--fresh",
+        action="store_true",
+        help=(
+            "Start from an EMPTY results dict instead of merging with whatever "
+            "is already in results_dir/all_results.json. Use this only when you "
+            "genuinely want to discard prior architectures' results from this "
+            "directory (e.g. the underlying data changed and old results are "
+            "stale) -- the default (merge) is what you want when running a "
+            "subset of --models, which is the common case and was previously a "
+            "footgun: running e.g. --models tabular_llm used to silently erase "
+            "every other architecture's results from the same directory."
+        ),
+    )
     args = ap.parse_args()
 
     with open(args.config) as f:
@@ -185,7 +221,19 @@ def main():
     else:
         selected = [k for k, v in cfg["models"].items() if v.get("enabled", False)]
 
-    all_results = {}
+    if args.fresh:
+        all_results = {}
+        print(f"--fresh: starting from an empty results dict (ignoring any existing {results_dir}/all_results.json)")
+    else:
+        all_results = load_existing_results(results_dir)
+        if all_results:
+            print(
+                f"Loaded {len(all_results)} existing architecture(s) from "
+                f"{results_dir}/all_results.json: {list(all_results.keys())} "
+                f"-- this run's architectures will be merged in, not replace them. "
+                f"(Pass --fresh to discard them instead.)"
+            )
+
     failed = []
     for name in selected:
         if name not in MODEL_REGISTRY:

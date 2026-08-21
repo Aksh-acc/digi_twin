@@ -116,7 +116,7 @@ separately, never folded into the primary twin's number).
 ### 0.3 Corrected-split results
 
 **`configs/config_corrected_prompt.yaml`** (`results_corrected_prompt/`; agent
-n=456, human n=1211) — all 7 architectures, leaky-split numbers alongside for
+n=456, human n=1211) — all 9 architectures, leaky-split numbers alongside for
 direct comparison:
 
 | architecture | agent→agent | agent→human | human→agent | human→human | gap_on_human | gap_on_agent |
@@ -126,8 +126,29 @@ direct comparison:
 | distilbert | 0.4605 *(was 0.4646)* | 0.3006 | 0.3904 | 0.3576 *(was 0.4431)* | +0.0570 *(was +0.1446)* | +0.0702 |
 | mnl_baseline | 0.4518 *(was 0.3875)* | 0.3377 | 0.3618 | 0.3551 *(was 0.3973)* | +0.0173 *(was +0.0008)* | +0.0899 |
 | hier_bayes | 0.4649 *(was 0.3812)* | 0.3130 | 0.3180 | 0.3790 *(was 0.4256)* | +0.0661 *(was +0.0449)* | +0.1469 |
+| tabular_llm | 0.5526 *(was 0.6479)* | 0.3675 | 0.4934 | 0.3658 *(was 0.4397)* | **−0.0017** *(was +0.0648)* | +0.0592 |
+| cognitive_decay | 0.3640 *(was 0.3708)* | 0.3212 | 0.3728 | 0.3468 *(was 0.3965)* | +0.0256 *(was +0.0249)* | −0.0088 |
 | **consensus** | 0.2544 | 0.3039 | 0.3039 | 0.2544 | +0.0000 | +0.0000 |
 | **majority** | 0.2544 | 0.3039 | 0.3039 | 0.2544 | +0.0000 | +0.0000 |
+
+**`tabular_llm` (added after the initial audit above) turned out to have the
+same disease as the text architectures, via a different mechanism.** It never
+sees raw prompt text — only the same 6 engineered price/rating/review
+features `mnl_baseline`/`hier_bayes` use — but it's a 2-layer Transformer
+with cross-option attention, high-capacity enough to memorize near-unique
+price/rating/review-count *combinations* per task under the leaky split
+rather than learning generalizable structure. Corrected, its agent→agent
+accuracy drops 9.5 points (0.6479→0.5526, the same magnitude as the text
+models' drops) and `gap_on_human` flips from +0.0648 to essentially zero
+(−0.0017) — it is **no longer the strongest twin in the study** once task
+identity is actually blocked; `tfidf_logreg` (0.5636) edges it out.
+`cognitive_decay` barely moves (0.3708→0.3640), consistent with it being a
+low-capacity MNL variant that structurally can't memorize — like
+`mnl_baseline`/`hier_bayes`, its leaky-split number was already honest. The
+practical lesson: **capacity, not text-vs-structured input, is what predicts
+memorization risk** under a task-identity leak — always re-check a new
+high-capacity architecture under `split_mode: "prompt"`/`"twoway"` before
+trusting its leaky-split number, regardless of what features it consumes.
 
 `consensus` collapses to exactly `majority` on every cell (0% lookup hit rate)
 — the direct, automatic proof the leak is closed on this split, vs. 100% hit
@@ -158,27 +179,38 @@ strictest human split — new person AND new product jointly, human n=242):
 | distilbert | 0.4364 | 0.3223 | 0.3004 | 0.2975 | **−0.0248** | +0.1360 |
 | mnl_baseline | 0.4518 | 0.3719 | 0.3421 | 0.2975 | **−0.0744** | +0.1096 |
 | hier_bayes | 0.4649 | 0.3264 | 0.3114 | 0.3347 | +0.0083 | +0.1535 |
+| tabular_llm | 0.5526 | 0.4256 | 0.4232 | 0.3512 | **−0.0744** | +0.1294 |
+| cognitive_decay | 0.3640 | 0.3017 | 0.3728 | 0.2810 | **−0.0207** | −0.0088 |
 | consensus | 0.2544 | 0.3223 | 0.3223 | 0.2544 | +0.0000 | +0.0000 |
 | majority | 0.2544 | 0.3223 | 0.3223 | 0.2544 | +0.0000 | +0.0000 |
 
-Agent-mode cells are byte-identical to `config_corrected_prompt.yaml`'s (same
-prompt-blocked agent split, same seed — confirmed exactly, down to the MCMC
-diagnostics). MCMC diagnostics for the human-mode fit: max r_hat=1.01, min
-ESS bulk/tail = 1269/930, divergences = 2/4000 (0.05%) — all within the
-pre-registered thresholds. `consensus` again collapses exactly to `majority`.
+Agent-mode cells for every architecture are byte-identical to
+`config_corrected_prompt.yaml`'s (same prompt-blocked agent split, same seed
+— confirmed exactly, down to the `hier_bayes` MCMC diagnostics: max
+r_hat=1.01, min ESS bulk/tail = 1269/930, divergences = 2/4000, 0.05%, all
+within the pre-registered thresholds). `consensus` again collapses exactly to
+`majority`. `tabular_llm`'s `gap_on_human` is again negative (−0.0744, tied
+with `tfidf_logreg`/`mnl_baseline` for the largest inversion in the table) —
+confirming the leakage-via-numeric-memorization finding above under the
+strictest split too. `cognitive_decay` also flips negative here (−0.0207),
+where it had been slightly positive under the prompt-blocked split.
 
 **This is the strongest evidence in the whole study that the original
 `gap_on_human > 0` finding was a leakage artifact.** Under the strictest
 possible split — a human test set that is simultaneously a new person AND a
 new product, discarding both partially-novel blocks — `gap_on_human` is
-**negative for 4 of 5 real architectures** (tfidf_logreg, embed_mlp,
-distilbert, mnl_baseline), and the one exception (`hier_bayes`, +0.0083) is
-an order of magnitude smaller than its leaky-split value (+0.0449). The two
-independently-designed corrected splits (`"prompt"` and `"twoway"`) agree on
-direction for 4 of 5 architectures despite very different test-set
-composition and size (1211 rows vs. 242 rows) — the kind of cross-validation
-that makes a corrected finding credible rather than an artifact of one
-particular resampling.
+**negative for 6 of 7 real architectures** (every one except `hier_bayes`,
++0.0083, which is still an order of magnitude smaller than its leaky-split
+value of +0.0449). The two independently-designed corrected splits
+(`"prompt"` and `"twoway"`) agree on sign for 4 of 7 architectures
+(`tfidf_logreg`, `embed_mlp`, `hier_bayes`, `tabular_llm`) despite very
+different test-set composition and size (1211 rows vs. 242 rows) — the kind
+of cross-validation that makes a corrected finding credible rather than an
+artifact of one particular resampling. The 3 that flip sign between splits
+(`distilbert`, `mnl_baseline`, `cognitive_decay`) all have small-magnitude
+`gap_on_human` in at least one split (|gap| ≤ 0.057) — consistent with noise
+around zero on a genuinely small effect, not a contradiction of the
+headline finding that large positive gaps were leakage artifacts.
 
 ---
 

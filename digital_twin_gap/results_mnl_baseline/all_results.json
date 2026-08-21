@@ -19,13 +19,13 @@
             "n": 192
           }
         },
-        "train_seconds": 0.6
+        "train_seconds": 0.5
       },
       "agent->human": {
         "accuracy": 0.39650872817955113,
         "macro_f1": 0.3940580870573785,
         "n": 1203,
-        "train_seconds": 0.6
+        "train_seconds": 0.5
       },
       "human->agent": {
         "accuracy": 0.325,
@@ -45,13 +45,13 @@
             "n": 192
           }
         },
-        "train_seconds": 0.6
+        "train_seconds": 0.5
       },
       "human->human": {
         "accuracy": 0.39733998337489607,
         "macro_f1": 0.39523840447212716,
         "n": 1203,
-        "train_seconds": 0.6
+        "train_seconds": 0.5
       }
     },
     "gaps": {
